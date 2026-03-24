@@ -1,0 +1,44 @@
+name: Doc tests
+
+# Runs the AI-powered doc test pipeline on changed documentation pages.
+# Tests are non-blocking (warn only) — they never prevent a PR from merging.
+#
+# To add a new page: add it to the paths filter and add a job below.
+# No other changes needed — the AI figures out what to run.
+#
+# Provider options (set ai-provider input):
+#   "github"     — uses built-in GITHUB_TOKEN, zero extra secrets, works out of the box
+#   "anthropic"  — requires ANTHROPIC_API_KEY org/repo secret, best results
+#   "openai"     — requires OPENAI_API_KEY org/repo secret
+
+on:
+  pull_request:
+    paths:
+      - 'docs/quick-start.md'
+      # Add new pages here as the pilot expands:
+      # - 'docs/apt.md'
+      # - 'docs/connect.md'
+
+  workflow_dispatch:
+    inputs:
+      doc-path:
+        description: "Doc page to test"
+        required: true
+        default: "docs/quick-start.md"
+
+jobs:
+  quick-start:
+    name: "Test: quick-start.md"
+    uses: ImTheKai/percona-doc-ci/.github/workflows/run-doc-tests.yml@main
+    with:
+      repo-name:      "postgresql-docs"
+      doc-path:       "docs/quick-start.md"
+      variables-file: "variables.yml"
+      runner-type:    "github"       # flip to "k8s" when EKS is ready
+      ai-provider:    "github"       # free, no extra secrets — change to "anthropic" for best results
+      # ai-model:     "gpt-4o"       # optional: override default model
+      use-percona-dk-sidecar: false
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}  # only needed if ai-provider=anthropic
+      # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}      # only needed if ai-provider=openai
+      # KUBECONFIG: ${{ secrets.KUBECONFIG }}              # only needed if runner-type=k8s
