@@ -61,7 +61,7 @@ For a step-by-step explanation, continue below.
 4. Create a database and make a table in the database:
 
      ```sql
-     CREATE DATABASE test;
+     CREATE DATBASE test;
      \c test
      CREATE TABLE customers (first_name VARCHAR(50), last_name VARCHAR(50), email VARCHAR(100));
      ```
